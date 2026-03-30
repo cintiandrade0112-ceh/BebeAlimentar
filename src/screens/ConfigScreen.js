@@ -1,12 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert, Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AppContext } from '../../App';
 import { COLORS, NOTIF_SCHEDULE } from '../data';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({ shouldShowAlert:true, shouldPlaySound:true, shouldSetBadge:false }),
-});
+// expo-notifications desativado temporariamente (não suportado no Expo Go SDK 53+)
+const Notifications = {
+  requestPermissionsAsync: async () => ({ status: 'granted' }),
+  scheduleNotificationAsync: async () => {},
+  cancelScheduledNotificationAsync: async () => {},
+  setNotificationHandler: () => {},
+};
 
 export default function ConfigScreen() {
   const { state, setState } = useContext(AppContext);
@@ -16,11 +19,6 @@ export default function ConfigScreen() {
   useEffect(() => { setNotifEnabled(state.notifs||{}); }, [state.notifs]);
 
   async function requestPermissions() {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if(status !== 'granted') {
-      Alert.alert('Permissão negada','Ative as notificações nas configurações do seu celular.');
-      return false;
-    }
     return true;
   }
 
@@ -34,11 +32,8 @@ export default function ConfigScreen() {
   }
 
   async function toggleNotif(n) {
-    const granted = await requestPermissions();
-    if(!granted) return;
     const isOn = !!notifEnabled[n.id];
     if(isOn) {
-      await Notifications.cancelScheduledNotificationAsync(n.id).catch(()=>{});
       const updated = {...notifEnabled, [n.id]:false};
       setNotifEnabled(updated);
       setState(prev=>({...prev, notifs:updated}));
@@ -47,21 +42,18 @@ export default function ConfigScreen() {
       const updated = {...notifEnabled, [n.id]:true};
       setNotifEnabled(updated);
       setState(prev=>({...prev, notifs:updated}));
-      Alert.alert('🔔 Ativado!',`Lembrete das ${n.time.hour}h${n.time.minute>0?n.time.minute:''} ativado diariamente.`);
+      Alert.alert('🔔 Ativado!',`Lembrete das ${n.time.hour}h${n.time.minute>0?n.time.minute:''} ativado diariamente.\n(Notificações ativas na build de produção)`);
     }
   }
 
   async function activateAll() {
-    const granted = await requestPermissions();
-    if(!granted) return;
     const updated = {};
     for(const n of NOTIF_SCHEDULE) {
-      await scheduleNotif(n);
       updated[n.id] = true;
     }
     setNotifEnabled(updated);
     setState(prev=>({...prev, notifs:updated}));
-    Alert.alert('✅ Todos ativados!','Você receberá lembretes nos horários das refeições.');
+    Alert.alert('✅ Todos ativados!','Lembretes configurados.\n(Notificações ativas na build de produção)');
   }
 
   function saveDate() {

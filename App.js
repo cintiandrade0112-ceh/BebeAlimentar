@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from 'react-native';
 import { loadState, saveState } from './src/data/storage';
 import HomeScreen from './src/screens/HomeScreen';
@@ -39,7 +40,7 @@ export default function App() {
   );
 
   return (
-    <AppContext.Provider value={{ state, setState }}>
+    <SafeAreaProvider><AppContext.Provider value={{ state, setState }}>
       <NavigationContainer>
         <StatusBar style="dark" />
         <Tab.Navigator
@@ -48,7 +49,7 @@ export default function App() {
             tabBarLabel: route.name,
             tabBarActiveTintColor: '#4A7050',
             tabBarInactiveTintColor: '#A89880',
-            tabBarStyle: { backgroundColor:'#FEFCF8', borderTopColor:'rgba(0,0,0,0.07)', height:68, paddingBottom:10 },
+            tabBarStyle: { backgroundColor:'#FEFCF8', borderTopColor:'rgba(0,0,0,0.07)', height:88, paddingBottom:100},
             tabBarLabelStyle: { fontSize:10, fontWeight:'600' },
             headerStyle: { backgroundColor:'#FEFCF8', borderBottomColor:'rgba(0,0,0,0.07)', borderBottomWidth:1 },
             headerTintColor: '#2E2A26',
@@ -63,6 +64,9 @@ export default function App() {
           <Tab.Screen name="Config" component={ConfigScreen} />
         </Tab.Navigator>
       </NavigationContainer>
-    </AppContext.Provider>
+    </AppContext.Provider></SafeAreaProvider>
   );
 }
+
+import { registerRootComponent } from 'expo';
+registerRootComponent(App);

@@ -16,14 +16,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#7A9E7E"
       },
-      "package": "com.bebealimentar.app",
-      "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE", "POST_NOTIFICATIONS"]
-    },
-    "plugins": [
-      ["expo-notifications", {
-        "icon": "./assets/icon.png",
-        "color": "#7A9E7E"
-      }]
-    ]
+      "package": "com.bebealimentar.app"
+    }
   }
 }
